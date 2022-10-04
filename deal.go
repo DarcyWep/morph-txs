@@ -47,7 +47,7 @@ func GetTxsByBlockNumber(blockNumber *big.Int) []*MorphTransaction {
 	return mtxs
 }
 
-func GetTxByHash(hash common.Hash) []*MorphTransaction {
+func GetTxByHash(hash string) []*MorphTransaction {
 	start := time.Now()
 	var wg sync.WaitGroup
 
@@ -77,7 +77,7 @@ func GetTxByHash(hash common.Hash) []*MorphTransaction {
 	wg.Wait()
 	transactionChan = nil
 	mtxs := dealTxs(&txs) // 处理一个区块的事务
-	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "Get the transactions by hash(\""+hash.Hex()+"\") spend "+time.Since(start).String())
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "Get the transactions by hash(\""+hash+"\") spend "+time.Since(start).String())
 	return mtxs
 }
 
@@ -178,7 +178,7 @@ func getTxsByBlockNumber(table string, blockNumber *big.Int, wg *sync.WaitGroup)
 }
 
 // getTxsByHash 获取某一交易
-func getTxByHash(table string, hash common.Hash, wg *sync.WaitGroup) {
+func getTxByHash(table string, hash string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	sqlServer := openSqlServer()
 	defer closeSqlServer(sqlServer)
@@ -186,7 +186,7 @@ func getTxByHash(table string, hash common.Hash, wg *sync.WaitGroup) {
 		fmt.Println("sqlServer is nil")
 		return
 	}
-	rows, err := sqlServer.Query("SELECT info FROM " + table + " WHERE hash=\"" + hash.Hex() + "\";")
+	rows, err := sqlServer.Query("SELECT info FROM " + table + " WHERE hash=\"" + hash + "\";")
 	defer rows.Close() // 非常重要：关闭rows释放持有的数据库链接
 	if err != nil {
 		fmt.Println("Query failed", err)
