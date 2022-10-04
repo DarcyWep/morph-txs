@@ -1,10 +1,11 @@
-package main
+package morph
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	_ "github.com/go-sql-driver/mysql" // 导入包但不使用, init()
 	"math/big"
 	"sync"
 	"time"
@@ -42,7 +43,7 @@ func GetTxsByBlockNumber(blockNumber *big.Int) []*MorphTransaction {
 	wg.Wait()
 	transactionChan = nil
 	mtxs := dealTxs(&txs) // 处理一个区块的事务
-	fmt.Println(time.Now(), "Get the transactions of block number("+blockNumber.String()+") spend "+time.Since(start).String())
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "Get the transactions of block number("+blockNumber.String()+") spend "+time.Since(start).String())
 	return mtxs
 }
 
@@ -76,7 +77,7 @@ func GetTxByHash(hash common.Hash) []*MorphTransaction {
 	wg.Wait()
 	transactionChan = nil
 	mtxs := dealTxs(&txs) // 处理一个区块的事务
-	fmt.Println(time.Now(), "Get the transactions by hash(\""+hash.Hex()+"\") spend "+time.Since(start).String())
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "Get the transactions by hash(\""+hash.Hex()+"\") spend "+time.Since(start).String())
 	return mtxs
 }
 

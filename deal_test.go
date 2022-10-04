@@ -1,13 +1,13 @@
-package main
+package morph
 
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
-	_ "github.com/go-sql-driver/mysql" // 导入包但不使用, init()
 	"math/big"
+	"testing"
 )
 
-func test() {
+func Test(t *testing.T) {
 	SetHost("202.114.6.20")
 	//min, max := big.NewInt(7202102), big.NewInt(8852777)
 	mtxs := GetTxsByBlockNumber(big.NewInt(7202102))

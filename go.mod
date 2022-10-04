@@ -1,4 +1,4 @@
-module clean-data
+module github.com/DarcyWep/morph-txs
 
 go 1.17
 
