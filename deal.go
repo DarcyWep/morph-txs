@@ -21,8 +21,8 @@ func GetTxsByBlockNumber(blockNumber *big.Int) []*MorphTransaction {
 	wg.Add(len(tables))
 	var txs []Transaction
 
-	for _, table := range tables {
-		go getTxsByBlockNumber(table, blockNumber, &wg)
+	for index, table := range tables {
+		go getTxsByBlockNumber(table, blockNumber, index, &wg)
 	}
 	var k = 0
 	for {
@@ -55,8 +55,8 @@ func GetTxByHash(hash string) []*MorphTransaction {
 	wg.Add(len(tables))
 	var txs []Transaction
 
-	for _, table := range tables {
-		go getTxByHash(table, hash, &wg)
+	for index, table := range tables {
+		go getTxByHash(table, hash, index, &wg)
 	}
 	var k = 0
 	for {
@@ -141,18 +141,13 @@ func dealTransfer(tr *Transfer) *MorphTransfer {
 }
 
 // getTxsByBlockNumber 获取某一区块号的所有交易
-func getTxsByBlockNumber(table string, blockNumber *big.Int, wg *sync.WaitGroup) {
+func getTxsByBlockNumber(table string, blockNumber *big.Int, index int, wg *sync.WaitGroup) {
 	defer wg.Done()
-	sqlServer := openSqlServer()
-	defer closeSqlServer(sqlServer)
-	if sqlServer == nil {
-		fmt.Println("sqlServer is nil")
-		return
-	}
+	sqlServer := sqlServers[index]
 	rows, err := sqlServer.Query("SELECT info FROM " + table + " WHERE blockNumber=\"" + (*hexutil.Big)(blockNumber).String() + "\";")
 	defer rows.Close() // 非常重要：关闭rows释放持有的数据库链接
 	if err != nil {
-		fmt.Println("Query failed", err)
+		fmt.Println("Error: Query failed", err)
 		return
 	}
 	// 循环读取结果集中的数据
@@ -164,12 +159,12 @@ func getTxsByBlockNumber(table string, blockNumber *big.Int, wg *sync.WaitGroup)
 		)
 		err = rows.Scan(&info)
 		if err != nil {
-			fmt.Println("Scan failed", err)
+			fmt.Println("Error: Scan failed", err)
 			return
 		}
 		err = json.Unmarshal([]byte(info), &tx)
 		if err != nil {
-			fmt.Println("Unmarshal failed", err)
+			fmt.Println("Error: Unmarshal failed", err)
 			return
 		}
 		txs = append(txs, tx)
@@ -178,18 +173,13 @@ func getTxsByBlockNumber(table string, blockNumber *big.Int, wg *sync.WaitGroup)
 }
 
 // getTxsByHash 获取某一交易
-func getTxByHash(table string, hash string, wg *sync.WaitGroup) {
+func getTxByHash(table string, hash string, index int, wg *sync.WaitGroup) {
 	defer wg.Done()
-	sqlServer := openSqlServer()
-	defer closeSqlServer(sqlServer)
-	if sqlServer == nil {
-		fmt.Println("sqlServer is nil")
-		return
-	}
+	sqlServer := sqlServers[index]
 	rows, err := sqlServer.Query("SELECT info FROM " + table + " WHERE hash=\"" + hash + "\";")
 	defer rows.Close() // 非常重要：关闭rows释放持有的数据库链接
 	if err != nil {
-		fmt.Println("Query failed", err)
+		fmt.Println("Error: Query failed", err)
 		return
 	}
 	// 循环读取结果集中的数据
@@ -201,12 +191,12 @@ func getTxByHash(table string, hash string, wg *sync.WaitGroup) {
 		)
 		err = rows.Scan(&info)
 		if err != nil {
-			fmt.Println("Scan failed", err)
+			fmt.Println("Error: Scan failed", err)
 			return
 		}
 		err = json.Unmarshal([]byte(info), &tx)
 		if err != nil {
-			fmt.Println("Unmarshal failed", err)
+			fmt.Println("Error: Unmarshal failed", err)
 			return
 		}
 		txs = append(txs, tx)

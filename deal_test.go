@@ -8,13 +8,27 @@ import (
 
 func Test(t *testing.T) {
 	SetHost("202.114.6.20")
+	err := OpenSqlServers()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer CloseSqlServers()
 	//min, max := big.NewInt(7202102), big.NewInt(8852777)
-	mtxs := GetTxsByBlockNumber(big.NewInt(7202102))
-	for _, tx := range mtxs {
-		fmt.Println(tx.Hash, tx.BlockNumber, tx.BlockHash, tx.From, tx.To, len(tx.Transfer))
+	for i := big.NewInt(8000000); i.Cmp(big.NewInt(8450000)) == -1; i = i.Add(i, big.NewInt(1)) {
+		mtxs := GetTxsByBlockNumber(i)
+		for _, tx := range mtxs {
+			if len(tx.Transfer) == 0 {
+				fmt.Println(tx.Hash, tx.BlockNumber, tx.BlockHash, tx.From, tx.To, len(tx.Transfer))
+			}
+		}
 	}
-	mtxs = GetTxByHash("0x5d6a7e06db5644a7921829094752a36ed3498376ab4a9b5dc69e30661bfe6828")
-	for _, tx := range mtxs {
-		fmt.Println(tx.Hash, tx.BlockNumber, tx.BlockHash, tx.From, tx.To, len(tx.Transfer))
-	}
+
+	//mtxs := GetTxByHash("0x6de644")
+	//for _, tx := range mtxs {
+	//	fmt.Println(tx.Hash, tx.BlockNumber, tx.BlockHash, tx.From, tx.To, len(tx.Transfer))
+	//	for _, tr := range tx.Transfer{
+	//		fmt.Println("From: " + tr.From, "  To: " + tr.To)
+	//	}
+	//}
 }

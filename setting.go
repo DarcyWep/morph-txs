@@ -1,6 +1,7 @@
 package morph
 
 import (
+	"database/sql"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"math/big"
@@ -27,6 +28,8 @@ var (
 		"txs31", "txs32", "txs33", "txs34", "txs35", "txs36", "txs37", "txs38", "txs39", "txs40",
 		"txs41", "txs42", "txs43", "txs44", "txs45", "txs46", "txs47", "txs48", "txs49", "txs50",
 		"txs51", "txs52", "txs53", "txs54", "txs55", "txs56", "txs57", "txs58", "txs59", "txs60"} // 表名
+
+	sqlServers []*sql.DB
 )
 
 func SetHost(host string) {

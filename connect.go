@@ -5,6 +5,20 @@ import (
 	"fmt"
 )
 
+func OpenSqlServers() error {
+	for range tables {
+		sqlServer := openSqlServer()
+		if sqlServer == nil {
+			for _, ss := range sqlServers {
+				_ = ss.Close()
+			}
+			return fmt.Errorf("Open sql server failed")
+		}
+		sqlServers = append(sqlServers, sqlServer)
+	}
+	return nil
+}
+
 func openSqlServer() *sql.DB {
 	sqlServer, err := sql.Open(driver, dataSource) // open不会检验用户名和密码
 	if err != nil {
@@ -14,7 +28,7 @@ func openSqlServer() *sql.DB {
 
 	_, err = sqlServer.Exec(useDatabase) // 选择数据库
 	if err != nil {
-		fmt.Println("Use database failed", err)
+		fmt.Println("Error: Use database failed", err)
 		_ = sqlServer.Close()
 		return nil
 	}
@@ -28,13 +42,8 @@ func closeSqlServer(sqlServer *sql.DB) {
 	}
 }
 
-func reloadSqlServer(sqlServer *sql.DB) {
-	if sqlServer == nil { // 数据库连接建立失败
-		for i := 0; i < 5; i++ { // 循环重启连接
-			sqlServer = openSqlServer()
-			if sqlServer != nil { // 连接成功
-				break
-			}
-		}
+func CloseSqlServers() {
+	for _, ss := range sqlServers {
+		closeSqlServer(ss)
 	}
 }
